@@ -1,0 +1,138 @@
+[package]
+authors = ["<xvi.xv.xii.ix.xxii.ix.xiv <xvi.xv.xii.ix.xxii.ix.xiv@gmail.com>"]
+name = "stm32f469_base_rtic"
+version = "0.1.1"
+edition = "2021"
+description = "A modular and reusable base project for STM32F469 microcontrollers using Rust and RTIC"
+keywords = ["embedded", "stm32f4", "rtic", "hal", "no-std"]
+categories = ["embedded", "no-std", "hardware-support"]
+repository = "https://github.com/yourusername/stm32f469-base-rtic"
+documentation = "https://docs.rs/stm32f469-base-rtic"
+homepage = "https://github.com/yourusername/stm32f469-base-rtic"
+readme = "README.md"
+license = "0BSD"
+rust-version = "1.75"
+exclude = [
+    "/.github",
+    "/.gitignore",
+    "/docs",
+    "*.md",
+    "/.vscode",
+]
+include = [
+    "/src/**/*.rs",
+    "/Cargo.toml",
+    "/build.rs",
+    "/memory.x",
+    "/link.x",
+    "/LICENSE*",
+    "/README.md",
+]
+
+[package.metadata.docs.rs]
+default-target = "thumbv7em-none-eabihf"
+features = ["debug"]
+rustdoc-args = ["--cfg", "docsrs"]
+targets = ["thumbv7em-none-eabihf"]
+
+[package.metadata.deb]
+maintainer = "xvi.xv.xii.ix.xxii.ix.xiv <xvi.xv.xii.ix.xxii.ix.xiv@gmail.com>"
+copyright = "2025, xvi.xv.xii.ix.xxii.ix.xiv <xvi.xv.xii.ix.xxii.ix.xiv@gmail.com>"
+license-file = ["LICENSE", "4"]
+extended-description = """
+A comprehensive base project for STM32F469 microcontrollers.
+Features:
+- RTIC framework for real-time applications
+- HAL abstractions for peripherals
+- Optional USB support
+- Minimal memory footprint
+- Optimized for embedded systems
+"""
+depends = "$auto"
+section = "embedded"
+priority = "optional"
+assets = [
+    ["target/release/stm32f469_base_rtic", "usr/bin/", "755"],
+    ["README.md", "usr/share/doc/stm32f469-base-rtic/README", "644"],
+]
+
+[package.metadata.embed]
+chip = "STM32F469NIHx"
+log_level = "WARN"
+reset_halt = false
+speed = 24000
+
+[package.metadata.probe-rs]
+chip = "STM32F469NIHx"
+protocol = "swd"
+speed = 24000
+connect_under_reset = true
+
+[package.metadata.size]
+pattern = "target/thumbv7em-none-eabihf/release/stm32f469_base_rtic"
+
+[[bin]]
+name = "stm32f469_base_rtic"
+path = "src/main.rs"
+test = false
+bench = false
+
+[dependencies]
+
+cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
+rtic = { version = "2.1.2", features = ["thumbv7-backend"] }
+stm32f4xx-hal = { version = "0.22.1", features = ["stm32f469"], default-features = false }
+heapless = "0.8.0"
+rtic-monotonics = { version = "2.0.3", features = ["cortex-m-systick"] }
+defmt = { version = "0.3", optional = true }
+defmt-rtt = { version = "0.4", optional = true }
+panic-probe = { version = "0.3", features = ["print-defmt"], optional = true }
+
+panic-halt = "1.0.0"
+
+# USB зависимости (опциональные)
+usb-device = { version = "0.3.2", optional = true }
+usbd-serial = { version = "0.2.2", optional = true }
+synopsys-usb-otg = { version = "0.4.0", optional = true }
+log = "0.4.22"
+bitflags = "2.8.0"
+
+[dev-dependencies]
+defmt = "0.3"
+defmt-rtt = "0.4"
+panic-probe = { version = "0.3", features = ["print-defmt", "print-rtt"] }
+cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
+cortex-m-rt = "0.7"
+
+[[test]]
+name = "ring_buffer"
+path = "tests/ring_buffer.rs"
+harness = true
+
+[features]
+default = ["usb"]
+
+usb = ["usb-device", "usbd-serial", "synopsys-usb-otg", "stm32f4xx-hal/otg-fs", "stm32f4xx-hal/usb_fs"]
+debug = ["dep:defmt", "dep:defmt-rtt", "dep:panic-probe"]
+
+test = ["dep:defmt", "dep:defmt-rtt"]
+
+[profile.dev]
+codegen-units = 1
+debug = 2
+debug-assertions = true
+incremental = false
+opt-level = 2
+overflow-checks = true
+panic = "abort"
+
+[profile.release]
+codegen-units = 1
+debug = 0
+debug-assertions = false
+incremental = false
+lto = "fat"
+opt-level = "z"
+overflow-checks = false
+strip = true
+panic = "abort"

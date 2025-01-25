@@ -1,0 +1,33 @@
+[target.thumbv7em-none-eabi]
+runner = "probe-rs run --chip STM32F469NIHx"  # Flashing via probe-rs
+linker = "arm-none-eabi-gcc"                  # ARM GCC linker
+
+# Common flags for all builds
+rustflags = [
+    # Linker script specification
+    "-C", "link-arg=-Tlink.x",
+    # Disable standard startup files
+    "-C", "link-arg=-nostartfiles",
+    # Print memory usage
+    "-C", "link-arg=-Wl,--print-memory-usage",
+    # defmt (deferred formatting) linker script
+    "-C", "link-arg=-Tdefmt.x",
+    # Remove unused sections (commented out)
+    # "-C", "link-arg=-Wl,--gc-sections",
+    # Strip all symbols (not recommended for RTT debugging)
+    # "-C", "link-arg=-Wl,--strip-all",
+]
+
+[build]
+target = "thumbv7em-none-eabi"  # Target architecture
+
+[target.'cfg(test)']
+runner = "probe-rs test --chip STM32F469NIHx"  # Test runner
+rustflags = [
+    "-C", "link-arg=-Tlink.x",
+    "-C", "link-arg=-nostartfiles",
+]
+
+[env]
+DEFMT_LOG = "debug"       # defmt log level
+RTT_BUFFER_SIZE = "16384" # RTT buffer size (for defmt)

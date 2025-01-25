@@ -1,0 +1,8 @@
+SECTIONS
+{
+  .defmt (INFO) : ALIGN(4)
+  {
+    KEEP(*(.defmt.*));
+  }
+}
+INSERT AFTER .rodata;
