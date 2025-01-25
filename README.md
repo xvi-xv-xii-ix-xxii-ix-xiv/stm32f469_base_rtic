@@ -83,7 +83,7 @@ Provides ready-to-run foundations for STM32F469NI-Discovery with:
 ### Getting Started
 1. Clone template repository:
    ```bash
-   git clone https://github.com/your-org/stm32f469-template
+   git clone https://github.com/xvi-xv-xii-ix-xxii-ix-xiv/stm32f469_base_rtic.git
 
 ## Safety-Critical Design
 
